@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teachable Machine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <style>
+    :root {
+      --accent: #6C63FF;
+      --accent-dark: #4B44CC;
+      --card-bg: #ffffff;
+      --body-bg: #f0f2f8;
+      --text-muted-custom: #6b7280;
+    }
+
+    body {
+      background: var(--body-bg);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .main-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(108, 99, 255, 0.10);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .brand-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #6C63FF, #a78bfa);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .brand-icon svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1e1b4b;
+      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted-custom);
+      font-size: 0.875rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #6C63FF, #a78bfa);
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      width: 100%;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 16px rgba(108, 99, 255, 0.30);
+    }
+
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(108, 99, 255, 0.40);
+      color: white;
+    }
+
+    .btn-start:active {
+      transform: scale(0.98);
+    }
+
+    .btn-start svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    #webcam-section {
+      margin-top: 1.75rem;
+      display: none;
+    }
+
+    #webcam-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+
+    #webcam-wrapper canvas {
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(108,99,255,0.15);
+      max-width: 100%;
+    }
+
+    .label-card {
+      background: #f8f7ff;
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid #ede9fe;
+    }
+
+    .label-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #3b3663;
+      margin-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .label-pct {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 50px;
+      background: #e8e5ff;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, #6C63FF, #a78bfa);
+      border-radius: 50px;
+      transition: width 0.3s ease;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0fdf4;
+      color: #16a34a;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.3rem 0.85rem;
+      border: 1px solid #bbf7d0;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-card">
+
+  <div class="brand-icon">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zm0 12c5.33 0 8 2.67 8 4v2H4v-2c0-1.33 2.67-4 8-4z"/>
+    </svg>
+  </div>
+
+  <h1>Teachable Machine</h1>
+  <p class="subtitle">Reconhecimento de imagem com IA em tempo real</p>
+
+  <button class="btn-start" onclick="init()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zm-1 14v-1h2v1h-2zm3-3.27l-.73.47H10.73L10 12.73V11h4v1.73z"/>
+    </svg>
+    Ativar câmera e iniciar IA
+  </button>
+
+  <div id="webcam-section">
+    <div class="d-flex justify-content-center mb-3">
+      <span class="status-badge">
+        <span class="status-dot"></span>
+        Câmera ativa — analisando em tempo real
+      </span>
+    </div>
+
+    <div id="webcam-wrapper"></div>
+    <div id="label-container"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script>
+  const URL = "https://teachablemachine.withgoogle.com/models/AA2e17ZL0/";
+  let model, webcam, labelContainer, maxPredictions;
+  let progressBars = [];
+
+  async function init() {
+    const btn = document.querySelector('.btn-start');
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+      Carregando modelo...
+    `;
+
+    try {
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+
+      const flip = true;
+      webcam = new tmImage.Webcam(300, 300, flip);
+      await webcam.setup();
+      await webcam.play();
+      window.requestAnimationFrame(loop);
+
+      document.getElementById("webcam-wrapper").appendChild(webcam.canvas);
+      document.getElementById("webcam-section").style.display = "block";
+
+      labelContainer = document.getElementById("label-container");
+      labelContainer.innerHTML = "";
+      progressBars = [];
+
+      for (let i = 0; i < maxPredictions; i++) {
+        const card = document.createElement("div");
+        card.className = "label-card";
+
+        const header = document.createElement("div");
+        header.className = "label-name";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.id = `class-name-${i}`;
+        nameSpan.textContent = `Classe ${i + 1}`;
+
+        const pctSpan = document.createElement("span");
+        pctSpan.className = "label-pct";
+        pctSpan.id = `class-pct-${i}`;
+        pctSpan.textContent = "0%";
+
+        header.appendChild(nameSpan);
+        header.appendChild(pctSpan);
+
+        const progressWrap = document.createElement("div");
+        progressWrap.className = "progress";
+
+        const bar = document.createElement("div");
+        bar.className = "progress-bar";
+        bar.style.width = "0%";
+        bar.setAttribute("role", "progressbar");
+        bar.setAttribute("aria-valuenow", "0");
+        bar.setAttribute("aria-valuemin", "0");
+        bar.setAttribute("aria-valuemax", "100");
+
+        progressWrap.appendChild(bar);
+        card.appendChild(header);
+        card.appendChild(progressWrap);
+        labelContainer.appendChild(card);
+        progressBars.push({ bar, nameSpan, pctSpan });
+      }
+
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:white">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zm-1 14v-1h2v1h-2zm3-3.27l-.73.47H10.73L10 12.73V11h4v1.73z"/>
+        </svg>
+        Reiniciar câmera
+      `;
+      btn.disabled = false;
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = `Erro ao iniciar. Tente novamente.`;
+      console.error(err);
+    }
+  }
+
+  async function loop() {
+    webcam.update();
+    await predict();
+    window.requestAnimationFrame(loop);
+  }
+
+  async function predict() {
+    const prediction = await model.predict(webcam.canvas);
+    for (let i = 0; i < maxPredictions; i++) {
+      const pct = Math.round(prediction[i].probability * 100);
+      progressBars[i].nameSpan.textContent = prediction[i].className;
+      progressBars[i].pctSpan.textContent = pct + "%";
+      progressBars[i].bar.style.width = pct + "%";
+      progressBars[i].bar.setAttribute("aria-valuenow", pct);
+    }
+  }
+</script>
+
+</body>
+</html>
